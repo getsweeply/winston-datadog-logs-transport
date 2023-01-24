@@ -1,4 +1,4 @@
-const tls = require('tls');
+const net = require('net');
 const Transport = require('winston-transport');
 const safeStringify = require('fast-safe-stringify');
 
@@ -9,7 +9,7 @@ const config = {
 
 const setupListeners = socket =>
   new Promise((resolve, reject) => {
-    socket.on('secureConnect', resolve).on('error', reject).on('timeout', reject);
+    socket.on('connect', resolve).on('error', reject).on('timeout', reject);
   });
 
 // @see @credits https://git.io/fhwzM
@@ -35,7 +35,7 @@ module.exports = class DatadogTransport extends Transport {
       this.emit('logged', info);
     });
 
-    const socket = tls.connect(config.port, config.host);
+    const socket = net.connect(config.port, config.host);
 
     try {
       // connect to socket
@@ -43,10 +43,6 @@ module.exports = class DatadogTransport extends Transport {
     } catch (exception) {
       // catch any exception that might happen and report it back
       return callback(exception);
-    }
-
-    if (!socket.authorized) {
-      return callback('Error connecting to DataDog');
     }
 
     // Merge the metadata with the log
