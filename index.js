@@ -48,7 +48,7 @@ module.exports = class DatadogTransport extends Transport {
     // Merge the metadata with the log
     const logEntry = {...this.metadata, ...info};
 
-    socket.write(`${config.apiKey} ${safeStringify(logEntry)}\r\n`, () => {
+    socket.write(`${safeStringify(logEntry)}\r\n`, () => {
       socket.end();
 
       return callback();
